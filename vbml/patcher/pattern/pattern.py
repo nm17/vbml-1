@@ -132,7 +132,10 @@ class Pattern:
         self._ahead = AheadValidation(
             Pattern, self.inclusions, self.nested, self.recursions
         )
-        self._compiler = re.compile(pattern.format(text), flags=context.get("flags", 0))
+        try:
+            self._compiler = re.compile(pattern.format(text), flags=context.get("flags", 0))
+        except (re.error, ValueError, KeyError, TypeError) as err:
+            raise PatternError("Unable to compile regex for this pattern. Check your pattern or your flags.") from err
         self._pregmatch: Optional[dict] = None
 
     def __call__(self, text: str):
